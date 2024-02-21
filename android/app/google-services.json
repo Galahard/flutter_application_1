@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "481720229500",
+    "project_id": "cryptolist-first-app",
+    "storage_bucket": "cryptolist-first-app.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:481720229500:android:efa799ad051f6779f133f9",
+        "android_client_info": {
+          "package_name": "com.example.flutter_application_1"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCEeu8_d5oyWKHKIoK8RxNWjRHnwulw_Xg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
