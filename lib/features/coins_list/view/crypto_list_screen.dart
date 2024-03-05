@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/features/coins_list/bloc/crypto_list_bloc.dart';
 import 'package:flutter_application_1/features/coins_list/widgets/widgets.dart';
@@ -7,6 +8,7 @@ import 'package:flutter_application_1/repositories/crypto_coins/crypto_coin.dart
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 
+@RoutePage()  
 class CryptoListScreen extends StatefulWidget {
   const CryptoListScreen({super.key});
 
