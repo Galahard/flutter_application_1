@@ -2,15 +2,36 @@
 import 'package:dio/dio.dart';
 
 import 'package:flutter_application_1/repositories/crypto_coins/crypto_coin.dart';
+import 'package:get_it/get_it.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:talker_flutter/talker_flutter.dart';
 
 class CryptoCoinsReposit implements AbstractCoinsRepository {
   CryptoCoinsReposit({
+    required this.cryptoCoinsBox,
     required this.dio,
   });
   final Dio dio;
+  final Box<CryptoCoin> cryptoCoinsBox;
 
   @override
   Future<List<CryptoCoin>> getCoinsList() async {
+    var cryptoCoinsList = <CryptoCoin>[];
+    try {
+       cryptoCoinsList = await _fetchCoinsListFromAPI();
+
+      final cryptoCoinsMap = {for (var e in cryptoCoinsList) e.name: e};
+
+      await cryptoCoinsBox.putAll(cryptoCoinsMap);
+    } catch (e, st) {
+      GetIt.instance<Talker>().handle(e, st);
+      cryptoCoinsList = cryptoCoinsBox.values.toList();
+    }
+      cryptoCoinsList.sort((a,b)=> b.details.priceInUSD.compareTo(a.details.priceInUSD));
+    return cryptoCoinsList;
+  }
+
+  Future<List<CryptoCoin>> _fetchCoinsListFromAPI() async {
     final response = await dio.get(
         'https://min-api.cryptocompare.com/data/pricemultifull?fsyms=BTC,ETH,BNB,AVAX,AID,SOL,XRP,LINK&tsyms=USD');
 
@@ -29,15 +50,26 @@ class CryptoCoinsReposit implements AbstractCoinsRepository {
 
   @override
   Future<CryptoCoin> getCoinDetails(String currencyCode) async {
+    try {
+  final coin =  await _fetchCoinDetailsFromAPI(currencyCode);
+  cryptoCoinsBox.put(currencyCode, coin);
+  return coin;
+}  catch (e, st) {
+  GetIt.instance<Talker>().handle(e, st);
+  return cryptoCoinsBox.get(currencyCode)!;
+}
+  }
+
+  Future<CryptoCoin> _fetchCoinDetailsFromAPI(String currencyCode) async {
     final response = await dio.get(
         'https://min-api.cryptocompare.com/data/pricemultifull?fsyms=$currencyCode&tsyms=USD');
-
+    
     final data = response.data as Map<String, dynamic>;
     final dataRaw = data['RAW'] as Map<String, dynamic>;
     final coinData = dataRaw[currencyCode] as Map<String, dynamic>;
     final usdData = coinData['USD'] as Map<String, dynamic>;
     final details = CryptoCoinDetail.fromJson(usdData);
-
+    
     return CryptoCoin(name: currencyCode, details: details);
   }
 }
